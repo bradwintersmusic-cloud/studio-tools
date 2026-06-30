@@ -195,7 +195,7 @@
     color: var(--muted);
   }
 
-  .metronome-btn svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+  .metronome-btn svg { width: 24px; height: 24px; fill: currentColor; }
   .metronome-btn.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
 
   .metronome-pulse {
@@ -611,7 +611,7 @@
 
   <header class="page-header">
     <div class="wordmark">Belmont University &middot; AET</div>
-    <h1>Studio Tools</h1>
+    <h1>AET Studio Tools</h1>
     <div class="meta">Tap tempo, delay calculator, frequency reference, and signal generator</div>
     <div class="tabs">
       <button class="tab-btn active" data-view="main">Tempo / Delay Calc</button>
@@ -634,8 +634,8 @@
           </button>
           <div class="side-controls">
             <button class="metronome-btn" id="metronomeBtn" title="Metronome on/off">
-              <svg viewBox="0 0 24 24">
-                <path d="M9 21h6M7 21l3.5-15h3L17 21M9.5 12l3-7 3 7" stroke-linecap="round" stroke-linejoin="round"/>
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+                <path fill="currentColor" d="m213.33 203.75l-28.45-89.41L212.43 84a6 6 0 0 0-8.88-8l-22.87 25.17l-18.26-57.42A13.94 13.94 0 0 0 149.08 34h-42.16a13.94 13.94 0 0 0-13.34 9.75l-50.91 160A14 14 0 0 0 56 222h144a14 14 0 0 0 13.34-18.25ZM187.45 162h-45.89l34-37.39ZM105 47.39a2 2 0 0 1 1.92-1.39h42.16a2 2 0 0 1 1.92 1.39l20.36 64l-46 50.61H68.55Zm96.6 161.79a1.94 1.94 0 0 1-1.6.82H56a2 2 0 0 1-1.9-2.61L64.73 174h126.54l10.62 33.39a1.94 1.94 0 0 1-.29 1.79"/>
               </svg>
             </button>
             <div class="metronome-pulse"><div class="metronome-pulse-fill" id="metronomePulse"></div></div>
@@ -945,10 +945,10 @@
     var rangeDescriptions = [
       { max: 60,    label: "Sub bass — felt more than heard (kick fundamentals, 808s)" },
       { max: 120,   label: "Bass — low end weight (bass guitar, kick body)" },
-      { max: 250,   label: "Low mids — warmth, can get muddy if excessive" },
+      { max: 250,   label: "Low mids — warmth, can get muddy if excessive, kick mud" },
       { max: 500,   label: "Mud zone — boxy buildup, common cut area on busy mixes" },
       { max: 1000,  label: "Low-mid body — fullness of vocals, guitars, snare body" },
-      { max: 2000,  label: "Midrange — vocal presence, instrument definition" },
+      { max: 2000,  label: "Midrange — vocal presence, instrument definition, acoustic guitar point" },
       { max: 4000,  label: "Upper mids — presence, can sound nasal/honky if excessive" },
       { max: 6000,  label: "Presence — clarity and intelligibility, vocal sibilance starts" },
       { max: 10000, label: "Brilliance — air, sparkle, cymbal shimmer" },
