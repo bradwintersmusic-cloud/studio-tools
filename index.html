@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Studio Tools — Belmont AET</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0b0b0f;
+    --surface:   #13131b;
+    --surface2:  #1b1b26;
+    --border:    #252533;
+    --accent:    #c8a86b;
+    --accent-bg: rgba(200, 168, 107, 0.10);
+    --text:      #e6e2d9;
+    --muted:     #8f8e9d;
+    --blue:      #5b9cf6;
+  }
+
+  html, body {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  input, select {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    padding: 48px 28px 100px;
+    touch-action: manipulation;
+  }
+
+  .page-header {
+    max-width: 920px;
+    margin: 0 auto 36px;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .wordmark {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+
+  h1 {
+    font-size: 30px;
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+
+  .meta {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    margin-bottom: 20px;
+  }
+
+  .tabs { display: flex; gap: 8px; }
+
+  .tab-btn {
+    padding: 6px 18px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab-btn.active {
+    background: var(--accent-bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .tab-btn:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+
+  .content { max-width: 920px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  .section-heading {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+
+  .section-heading .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .panel {
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    background: var(--surface);
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+
+  /* TAP TEMPO + METRONOME */
+  .tempo-row { display: flex; gap: 14px; align-items: stretch; }
+
+  .tap-button {
+    flex: 1;
+    min-height: 150px;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    transition: border-color 0.1s, background 0.08s, transform 0.06s;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .tap-button:active { background: var(--accent-bg); border-color: var(--accent); transform: scale(0.985); }
+  .tap-button.flash { border-color: var(--blue); }
+
+  .bpm-readout {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 64px;
+    font-weight: 500;
+    color: var(--blue);
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .bpm-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .tap-hint {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .side-controls { display: flex; flex-direction: column; gap: 10px; width: 90px; }
+
+  .metronome-btn {
+    flex: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: border-color 0.15s, background 0.15s;
+    color: var(--muted);
+  }
+
+  .metronome-btn svg { width: 30px; height: 30px; stroke: currentColor; fill: none; stroke-width: 1.4; }
+  .metronome-btn.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+  .metronome-pulse {
+    width: 100%;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    overflow: hidden;
+    position: relative;
+  }
+
+  .metronome-pulse-fill { position: absolute; inset: 0; background: var(--accent); opacity: 0; transition: opacity 0.05s; }
+
+  .bpm-manual { margin-top: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+  .bpm-manual label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .bpm-manual input[type="number"] {
+    width: 80px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 6px 8px;
+    outline: none;
+  }
+
+  .bpm-manual input[type="number"]:focus { border-color: var(--accent); }
+
+  .reset-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+  }
+
+  .reset-btn:hover { border-color: var(--muted); color: var(--text); }
+
+  /* DELAY CALCULATOR */
+  .delay-controls { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+  .dotted-toggle { display: flex; align-items: center; gap: 8px; }
+
+  .switch {
+    width: 36px;
+    height: 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    position: relative;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    flex-shrink: 0;
+  }
+
+  .switch.on { background: var(--accent-bg); border-color: var(--accent); }
+
+  .switch-knob {
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--muted);
+    transition: transform 0.15s, background 0.15s;
+  }
+
+  .switch.on .switch-knob { transform: translateX(16px); background: var(--accent); }
+
+  .switch-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    padding: 7px 14px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--muted);
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--accent-bg); }
+
+  td { padding: 8px 14px; vertical-align: middle; }
+  .note-name { font-weight: 500; color: var(--text); }
+  .note-ms { font-family: 'IBM Plex Mono', monospace; color: var(--blue); font-size: 13px; }
+
+  .poly-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .poly-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 10px 12px; }
+
+  .poly-card .poly-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .poly-card .poly-value { font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--blue); }
+
+  /* KEY / FREQUENCY CALCULATOR */
+  .key-controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
+
+  .key-controls label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 7px 10px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  select:focus { border-color: var(--accent); }
+
+  .freq-table-wrap {
+    max-height: 560px;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+  }
+
+  .freq-table-wrap table { border: none; }
+  .freq-table-wrap thead th { position: sticky; top: 0; z-index: 1; }
+
+  .freq-hz { font-family: 'IBM Plex Mono', monospace; color: var(--blue); font-size: 12px; white-space: nowrap; }
+  .freq-desc { color: var(--muted); font-size: 12px; }
+
+  .freq-octave-row td {
+    background: var(--surface2);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--accent);
+    padding: 5px 14px;
+  }
+
+  /* SIGNAL GENERATOR */
+  .wave-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .wave-btn {
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 5px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 12px 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .wave-btn.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+  .wave-btn:hover:not(.active) { border-color: var(--muted); color: var(--text); }
+
+  .gen-control { margin-bottom: 18px; }
+  .gen-control-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+  .gen-control-row label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .gen-value-input {
+    width: 90px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--blue);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 5px 8px;
+    outline: none;
+    text-align: right;
+  }
+
+  .gen-value-input:focus { border-color: var(--accent); }
+
+  input[type="range"] {
+    width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  .gen-play-row { display: flex; gap: 10px; align-items: center; }
+
+  .gen-play-btn {
+    flex: 1;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .gen-play-btn.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+  .gen-play-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+  @media (max-width: 560px) {
+    body { padding: 32px 16px 80px; }
+    .tempo-row { flex-direction: row; }
+    .bpm-readout { font-size: 48px; }
+    .tap-button { min-height: 130px; }
+    .side-controls { width: 72px; }
+  }
+
+  /* ── Belmont floating nav ── */
+  .belmont-nav {
+    position: fixed;
+    z-index: 200;
+    top: 24px;
+    left: 24px;
+  }
+
+  @media (max-width: 560px) {
+    .belmont-nav {
+      top: auto;
+      left: auto;
+      bottom: 20px;
+      right: 20px;
+    }
+  }
+
+  .belmont-nav-toggle {
+    width: 38px;
+    height: 38px;
+    background: var(--surface);
+    border: 1.5px solid var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+  }
+
+  .belmont-nav-toggle:hover { background: var(--surface2); }
+  .belmont-nav-toggle svg { width: 16px; height: 16px; }
+  .belmont-nav-toggle svg rect { fill: var(--accent); }
+
+  .belmont-nav-menu {
+    position: absolute;
+    top: 46px;
+    left: 0;
+    min-width: 196px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 16px 44px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+
+  @media (max-width: 560px) {
+    .belmont-nav-menu {
+      top: auto;
+      bottom: 46px;
+      left: auto;
+      right: 0;
+      transform: translateY(6px);
+    }
+  }
+
+  .belmont-nav.open .belmont-nav-menu {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .belmont-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 14px;
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.12s;
+    position: relative;
+  }
+
+  .belmont-nav-link:last-child { border-bottom: none; }
+  .belmont-nav-link:hover { background: var(--surface2); }
+
+  .belmont-nav-link-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 5px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--accent);
+  }
+
+  .belmont-nav-link-icon svg { width: 15px; height: 15px; }
+
+  .belmont-nav-link-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  .belmont-nav-link.is-current .belmont-nav-link-icon {
+    color: var(--blue);
+    border-color: var(--blue);
+    box-shadow: 0 0 0 3px rgba(91, 156, 246, 0.18), 0 0 14px rgba(91, 156, 246, 0.35);
+  }
+
+  .belmont-nav-link.is-current .belmont-nav-link-label { color: var(--blue); }
+</style>
+</head>
+<body>
+
+  <header class="page-header">
+    <div class="wordmark">Belmont University &middot; AET</div>
+    <h1>Studio Tools</h1>
+    <div class="meta">Tap tempo, delay calculator, frequency reference, and signal generator</div>
+    <div class="tabs">
+      <button class="tab-btn active" data-view="main">Tempo / Delay Calc</button>
+      <button class="tab-btn" data-view="key">Key / Frequency</button>
+      <button class="tab-btn" data-view="signal">Signal Generator</button>
+    </div>
+  </header>
+
+  <main class="content">
+
+    <div class="view active" id="view-main">
+
+      <div class="section-heading"><div class="dot"></div>Tap Tempo</div>
+      <div class="panel">
+        <div class="tempo-row">
+          <button class="tap-button" id="tapButton">
+            <div class="bpm-readout" id="bpmReadout">120</div>
+            <div class="bpm-label">BPM</div>
+            <div class="tap-hint">Tap to set tempo</div>
+          </button>
+          <div class="side-controls">
+            <button class="metronome-btn" id="metronomeBtn" title="Metronome on/off">
+              <svg viewBox="0 0 24 24">
+                <path d="M9 21h6M7 21l3.5-15h3L17 21M9.5 12l3-7 3 7" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+            <div class="metronome-pulse"><div class="metronome-pulse-fill" id="metronomePulse"></div></div>
+          </div>
+        </div>
+
+        <div class="bpm-manual">
+          <label for="bpmInput">Manual BPM</label>
+          <input type="number" id="bpmInput" value="120" min="20" max="300" step="1">
+          <button class="reset-btn" id="resetTapBtn">Reset Taps</button>
+        </div>
+      </div>
+
+      <div class="section-heading"><div class="dot"></div>Delay Calculator</div>
+      <div class="panel">
+        <div class="delay-controls">
+          <div class="dotted-toggle">
+            <div class="switch" id="dottedSwitch"><div class="switch-knob"></div></div>
+            <span class="switch-label">Dotted Values</span>
+          </div>
+        </div>
+        <table>
+          <thead><tr><th>Note Value</th><th>Delay (ms)</th></tr></thead>
+          <tbody id="delayTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="section-heading"><div class="dot"></div>Polyrhythm Reference</div>
+      <div class="panel">
+        <div class="poly-grid" id="polyGrid"></div>
+      </div>
+
+    </div>
+
+    <div class="view" id="view-key">
+      <div class="section-heading"><div class="dot"></div>Key / Frequency / Note Calculator</div>
+      <div class="panel">
+        <div class="key-controls">
+          <label for="keySelect">Root Key</label>
+          <select id="keySelect">
+            <option value="C">C</option>
+            <option value="C#">C# / Db</option>
+            <option value="D">D</option>
+            <option value="D#">D# / Eb</option>
+            <option value="E">E</option>
+            <option value="F">F</option>
+            <option value="F#">F# / Gb</option>
+            <option value="G">G</option>
+            <option value="G#">G# / Ab</option>
+            <option value="A" selected>A</option>
+            <option value="A#">A# / Bb</option>
+            <option value="B">B</option>
+          </select>
+
+          <label for="scaleSelect">Scale</label>
+          <select id="scaleSelect">
+            <option value="major" selected>Major</option>
+            <option value="minor">Minor (Natural)</option>
+          </select>
+
+          <label for="refPitch">A4 Reference</label>
+          <select id="refPitch">
+            <option value="432">432 Hz</option>
+            <option value="440" selected>440 Hz</option>
+            <option value="442">442 Hz</option>
+            <option value="444">444 Hz</option>
+          </select>
+        </div>
+
+        <div class="freq-table-wrap">
+          <table>
+            <thead><tr><th>Note</th><th>Frequency</th><th>Range / Character</th></tr></thead>
+            <tbody id="freqTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="view" id="view-signal">
+      <div class="section-heading"><div class="dot"></div>Signal Generator</div>
+      <div class="panel">
+
+        <div class="wave-grid" id="waveGrid"></div>
+
+        <div class="gen-control">
+          <div class="gen-control-row">
+            <label for="freqInput">Frequency (Hz)</label>
+            <input type="number" class="gen-value-input" id="freqInput" value="440" min="20" max="20000" step="1">
+          </div>
+          <input type="range" id="freqSlider" min="20" max="20000" value="440" step="1">
+        </div>
+
+        <div class="gen-control">
+          <div class="gen-control-row">
+            <label for="volInput">Volume</label>
+            <input type="number" class="gen-value-input" id="volInput" value="25" min="0" max="100" step="1">
+          </div>
+          <input type="range" id="volSlider" min="0" max="100" value="25" step="1">
+        </div>
+
+        <div class="gen-play-row">
+          <button class="gen-play-btn" id="genPlayBtn">
+            <svg viewBox="0 0 16 16"><polygon points="3,1 15,8 3,15"/></svg>
+            <span id="genPlayLabel">Play</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // TAB NAVIGATION
+    var tabBtns = document.querySelectorAll(".tab-btn");
+    var views = document.querySelectorAll(".view");
+
+    function switchView(name) {
+      for (var i = 0; i < views.length; i++) {
+        views[i].classList.toggle("active", views[i].id === "view-" + name);
+      }
+      for (var i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.toggle("active", tabBtns[i].getAttribute("data-view") === name);
+      }
+      if (name !== "main" && metronomeOn) { toggleMetronome(false); }
+      if (name !== "signal" && genPlaying) { toggleGenerator(false); }
+    }
+
+    for (var i = 0; i < tabBtns.length; i++) {
+      tabBtns[i].addEventListener("click", function() {
+        switchView(this.getAttribute("data-view"));
+      });
+    }
+
+    document.addEventListener("visibilitychange", function() {
+      if (document.hidden) {
+        if (metronomeOn) { toggleMetronome(false); }
+        if (genPlaying) { toggleGenerator(false); }
+      }
+    });
+    window.addEventListener("pagehide", function() {
+      if (metronomeOn) { toggleMetronome(false); }
+      if (genPlaying) { toggleGenerator(false); }
+    });
+
+    // SHARED AUDIO CONTEXT
+    var audioCtx = null;
+    function getCtx() {
+      if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (audioCtx.state === "suspended") { audioCtx.resume(); }
+      return audioCtx;
+    }
+
+    // TAP TEMPO
+    var tapTimes = [];
+    var currentBpm = 120;
+    var tapButton = document.getElementById("tapButton");
+    var bpmReadout = document.getElementById("bpmReadout");
+    var bpmInput = document.getElementById("bpmInput");
+    var resetTapBtn = document.getElementById("resetTapBtn");
+
+    function setBpm(bpm, fromInput) {
+      currentBpm = Math.max(20, Math.min(300, Math.round(bpm)));
+      bpmReadout.textContent = currentBpm;
+      if (!fromInput) { bpmInput.value = currentBpm; }
+      renderDelayTable();
+      renderPolyGrid();
+      updateMetronomeInterval();
+    }
+
+    function registerTap() {
+      var now = performance.now();
+      tapTimes.push(now);
+      tapTimes = tapTimes.filter(function(t) { return now - t < 2500; });
+      if (tapTimes.length > 8) { tapTimes.shift(); }
+
+      if (tapTimes.length >= 2) {
+        var intervals = [];
+        for (var i = 1; i < tapTimes.length; i++) { intervals.push(tapTimes[i] - tapTimes[i - 1]); }
+        var avg = intervals.reduce(function(a, b) { return a + b; }, 0) / intervals.length;
+        setBpm(60000 / avg, false);
+      }
+
+      tapButton.classList.add("flash");
+      setTimeout(function() { tapButton.classList.remove("flash"); }, 90);
+    }
+
+    tapButton.addEventListener("pointerdown", function(e) { e.preventDefault(); registerTap(); });
+    resetTapBtn.addEventListener("click", function() { tapTimes = []; });
+
+    bpmInput.addEventListener("input", function() {
+      var val = parseFloat(this.value);
+      if (!isNaN(val) && val > 0) { setBpm(val, true); }
+    });
+
+    // METRONOME
+    var metronomeOn = false;
+    var metronomeBtn = document.getElementById("metronomeBtn");
+    var metronomePulse = document.getElementById("metronomePulse");
+    var metronomeTimer = null;
+
+    function playClick() {
+      var ctx = getCtx();
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "square";
+      osc.frequency.value = 1800;
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.05);
+
+      metronomePulse.style.opacity = "1";
+      setTimeout(function() { metronomePulse.style.opacity = "0"; }, 80);
+    }
+
+    function updateMetronomeInterval() {
+      if (metronomeOn) {
+        clearInterval(metronomeTimer);
+        metronomeTimer = setInterval(playClick, 60000 / currentBpm);
+      }
+    }
+
+    function toggleMetronome(force) {
+      metronomeOn = (force !== undefined) ? force : !metronomeOn;
+      metronomeBtn.classList.toggle("on", metronomeOn);
+      if (metronomeOn) {
+        playClick();
+        metronomeTimer = setInterval(playClick, 60000 / currentBpm);
+      } else {
+        clearInterval(metronomeTimer);
+        metronomePulse.style.opacity = "0";
+      }
+    }
+
+    metronomeBtn.addEventListener("click", function() { toggleMetronome(); });
+
+    // DELAY CALCULATOR
+    var dottedOn = false;
+    var dottedSwitch = document.getElementById("dottedSwitch");
+    var delayTableBody = document.getElementById("delayTableBody");
+
+    var noteValues = [
+      { name: "1/1", div: 1/4 },
+      { name: "1/2", div: 1/2 },
+      { name: "1/4", div: 1 },
+      { name: "1/8", div: 2 },
+      { name: "1/16", div: 4 },
+      { name: "1/32", div: 8 },
+      { name: "1/64", div: 16 },
+      { name: "1/128", div: 32 }
+    ];
+
+    function renderDelayTable() {
+      var quarterMs = 60000 / currentBpm;
+      var html = "";
+      for (var i = 0; i < noteValues.length; i++) {
+        var nv = noteValues[i];
+        var ms = quarterMs / nv.div;
+        var label = nv.name;
+        if (dottedOn) { ms = ms * 1.5; label += " (dotted)"; }
+        html += '<tr><td class="note-name">' + label + '</td><td class="note-ms">' + ms.toFixed(1) + ' ms</td></tr>';
+      }
+      delayTableBody.innerHTML = html;
+    }
+
+    dottedSwitch.addEventListener("click", function() {
+      dottedOn = !dottedOn;
+      dottedSwitch.classList.toggle("on", dottedOn);
+      renderDelayTable();
+    });
+
+    // POLYRHYTHM REFERENCE
+    var polyGrid = document.getElementById("polyGrid");
+    var polyPairs = [
+      { label: "Triplets (3:2)", a: 3, b: 2 },
+      { label: "3 over 4", a: 4, b: 3 },
+      { label: "5 over 4", a: 4, b: 5 },
+      { label: "7 over 4", a: 4, b: 7 }
+    ];
+
+    function renderPolyGrid() {
+      var quarterMs = 60000 / currentBpm;
+      var html = "";
+      for (var i = 0; i < polyPairs.length; i++) {
+        var p = polyPairs[i];
+        var ms = (quarterMs * p.a) / p.b;
+        html += '<div class="poly-card"><div class="poly-label">' + p.label + '</div><div class="poly-value">' + ms.toFixed(1) + ' ms</div></div>';
+      }
+      polyGrid.innerHTML = html;
+    }
+
+    // KEY / FREQUENCY CALCULATOR
+    var keySelect = document.getElementById("keySelect");
+    var scaleSelect = document.getElementById("scaleSelect");
+    var refPitch = document.getElementById("refPitch");
+    var freqTableBody = document.getElementById("freqTableBody");
+    var noteNames = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+
+    // Semitone interval steps from the root for each scale type
+    var scaleIntervals = {
+      major: [0, 2, 4, 5, 7, 9, 11],
+      minor: [0, 2, 3, 5, 7, 8, 10]
+    };
+
+    var rangeDescriptions = [
+      { max: 60,    label: "Sub bass — felt more than heard (kick fundamentals, 808s)" },
+      { max: 120,   label: "Bass — low end weight (bass guitar, kick body)" },
+      { max: 250,   label: "Low mids — warmth, can get muddy if excessive" },
+      { max: 500,   label: "Mud zone — boxy buildup, common cut area on busy mixes" },
+      { max: 1000,  label: "Low-mid body — fullness of vocals, guitars, snare body" },
+      { max: 2000,  label: "Midrange — vocal presence, instrument definition" },
+      { max: 4000,  label: "Upper mids — presence, can sound nasal/honky if excessive" },
+      { max: 6000,  label: "Presence — clarity and intelligibility, vocal sibilance starts" },
+      { max: 10000, label: "Brilliance — air, sparkle, cymbal shimmer" },
+      { max: 20000, label: "Ultra high — sense of openness, mostly air and harmonics" }
+    ];
+
+    function describeFreq(hz) {
+      for (var i = 0; i < rangeDescriptions.length; i++) {
+        if (hz <= rangeDescriptions[i].max) { return rangeDescriptions[i].label; }
+      }
+      return rangeDescriptions[rangeDescriptions.length - 1].label;
+    }
+
+    function renderFreqTable() {
+      var rootName = keySelect.value;
+      var scaleType = scaleSelect.value;
+      var a4 = parseFloat(refPitch.value);
+      var rootIndex = noteNames.indexOf(rootName);
+      var intervals = scaleIntervals[scaleType];
+
+      // Build the set of pitch classes (0-11) that belong to this key,
+      // in scale order, each tagged with its semitone offset from C.
+      var scalePitchClasses = [];
+      for (var i = 0; i < intervals.length; i++) {
+        scalePitchClasses.push((rootIndex + intervals[i]) % 12);
+      }
+
+      var html = "";
+      var lastOctave = null;
+
+      for (var midi = 0; midi <= 135; midi++) {
+        var pitchClass = midi % 12;
+        if (scalePitchClasses.indexOf(pitchClass) === -1) { continue; }
+
+        var freq = a4 * Math.pow(2, (midi - 69) / 12);
+        if (freq < 20 || freq > 20000) { continue; }
+
+        var octave = Math.floor(midi / 12) - 1;
+        var noteLabel = noteNames[pitchClass] + octave;
+
+        if (octave !== lastOctave) {
+          html += '<tr class="freq-octave-row"><td colspan="3">Octave ' + octave + '</td></tr>';
+          lastOctave = octave;
+        }
+
+        var rootTag = (pitchClass === rootIndex) ? ' <span style="color:var(--accent);">(root)</span>' : '';
+
+        html += '<tr>' +
+          '<td class="note-name">' + noteLabel + rootTag + '</td>' +
+          '<td class="freq-hz">' + freq.toFixed(freq < 100 ? 2 : 1) + ' Hz</td>' +
+          '<td class="freq-desc">' + describeFreq(freq) + '</td>' +
+          '</tr>';
+      }
+
+      freqTableBody.innerHTML = html || '<tr><td colspan="3" class="freq-desc">No notes in range.</td></tr>';
+    }
+
+    keySelect.addEventListener("change", renderFreqTable);
+    scaleSelect.addEventListener("change", renderFreqTable);
+    refPitch.addEventListener("change", renderFreqTable);
+
+    // SIGNAL GENERATOR
+    var waveGrid = document.getElementById("waveGrid");
+    var freqSlider = document.getElementById("freqSlider");
+    var freqInput = document.getElementById("freqInput");
+    var volSlider = document.getElementById("volSlider");
+    var volInput = document.getElementById("volInput");
+    var genPlayBtn = document.getElementById("genPlayBtn");
+    var genPlayLabel = document.getElementById("genPlayLabel");
+
+    var waveTypes = [
+      { id: "sine", label: "Sine" },
+      { id: "square", label: "Square" },
+      { id: "sawtooth", label: "Sawtooth" },
+      { id: "triangle", label: "Triangle" },
+      { id: "white", label: "White Noise" },
+      { id: "pink", label: "Pink Noise" },
+      { id: "brown", label: "Brown Noise" }
+    ];
+
+    var currentWave = "sine";
+
+    function buildWaveGrid() {
+      var html = "";
+      for (var i = 0; i < waveTypes.length; i++) {
+        var w = waveTypes[i];
+        html += '<button class="wave-btn' + (w.id === currentWave ? " active" : "") + '" data-wave="' + w.id + '">' + w.label + '</button>';
+      }
+      waveGrid.innerHTML = html;
+
+      var btns = waveGrid.querySelectorAll(".wave-btn");
+      for (var i = 0; i < btns.length; i++) {
+        btns[i].addEventListener("click", function() {
+          currentWave = this.getAttribute("data-wave");
+          var all = waveGrid.querySelectorAll(".wave-btn");
+          for (var j = 0; j < all.length; j++) { all[j].classList.remove("active"); }
+          this.classList.add("active");
+          var isNoise = (currentWave === "white" || currentWave === "pink" || currentWave === "brown");
+          freqSlider.disabled = isNoise;
+          freqInput.disabled = isNoise;
+          if (genPlaying) { stopGenAudio(); startGenAudio(); }
+        });
+      }
+    }
+    buildWaveGrid();
+
+    function syncPair(slider, input, min, max) {
+      slider.addEventListener("input", function() { input.value = this.value; updateGenLive(); });
+      input.addEventListener("input", function() {
+        var v = parseFloat(this.value);
+        if (isNaN(v)) { return; }
+        v = Math.max(min, Math.min(max, v));
+        slider.value = v;
+        updateGenLive();
+      });
+    }
+    syncPair(freqSlider, freqInput, 20, 20000);
+    syncPair(volSlider, volInput, 0, 100);
+
+    var genPlaying = false;
+    var genNodes = null;
+
+    function makeNoiseBuffer(ctx, type) {
+      var bufferSize = ctx.sampleRate * 2;
+      var buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      var data = buffer.getChannelData(0);
+
+      if (type === "white") {
+        for (var i = 0; i < bufferSize; i++) { data[i] = Math.random() * 2 - 1; }
+      } else if (type === "pink") {
+        var b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+        for (var i = 0; i < bufferSize; i++) {
+          var white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          var pink = b0+b1+b2+b3+b4+b5+b6+white*0.5362;
+          b6 = white * 0.115926;
+          data[i] = pink * 0.11;
+        }
+      } else if (type === "brown") {
+        var lastOut = 0;
+        for (var i = 0; i < bufferSize; i++) {
+          var white = Math.random() * 2 - 1;
+          lastOut = (lastOut + (0.02 * white)) / 1.02;
+          data[i] = lastOut * 3.5;
+        }
+      }
+      return buffer;
+    }
+
+    function startGenAudio() {
+      var ctx = getCtx();
+      var gain = ctx.createGain();
+      gain.gain.value = (parseFloat(volInput.value) / 100) * 0.3;
+      gain.connect(ctx.destination);
+
+      var source;
+      if (currentWave === "white" || currentWave === "pink" || currentWave === "brown") {
+        var buffer = makeNoiseBuffer(ctx, currentWave);
+        source = ctx.createBufferSource();
+        source.buffer = buffer;
+        source.loop = true;
+      } else {
+        source = ctx.createOscillator();
+        source.type = currentWave;
+        source.frequency.value = parseFloat(freqInput.value);
+      }
+
+      source.connect(gain);
+      source.start();
+      genNodes = { source: source, gain: gain };
+    }
+
+    function stopGenAudio() {
+      if (genNodes) {
+        try {
+          genNodes.gain.gain.setTargetAtTime(0, audioCtx.currentTime, 0.01);
+          genNodes.source.stop(audioCtx.currentTime + 0.05);
+        } catch (e) {}
+        genNodes = null;
+      }
+    }
+
+    function updateGenLive() {
+      if (genNodes) {
+        if (genNodes.source.frequency) { genNodes.source.frequency.value = parseFloat(freqInput.value); }
+        genNodes.gain.gain.value = (parseFloat(volInput.value) / 100) * 0.3;
+      }
+    }
+
+    function toggleGenerator(force) {
+      genPlaying = (force !== undefined) ? force : !genPlaying;
+      genPlayBtn.classList.toggle("on", genPlaying);
+      genPlayLabel.textContent = genPlaying ? "Stop" : "Play";
+      if (genPlaying) { startGenAudio(); } else { stopGenAudio(); }
+    }
+
+    genPlayBtn.addEventListener("click", function() { toggleGenerator(); });
+
+    // INIT
+    setBpm(120, true);
+    renderFreqTable();
+  </script>
+
+  <!-- ── Belmont floating nav ── -->
+  <div class="belmont-nav" id="belmontNav" data-current="tools">
+    <button class="belmont-nav-toggle" id="belmontNavToggle" aria-label="Open navigation" aria-expanded="false">
+      <svg viewBox="0 0 16 16">
+        <rect x="2" y="4" width="12" height="1.6" rx="0.8"/>
+        <rect x="2" y="7.2" width="12" height="1.6" rx="0.8"/>
+        <rect x="2" y="10.4" width="12" height="1.6" rx="0.8"/>
+      </svg>
+    </button>
+
+    <nav class="belmont-nav-menu">
+      <a class="belmont-nav-link" data-page="schedule" href="https://bradwintersmusic-cloud.github.io/studioassistant-sync/">
+        <span class="belmont-nav-link-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="1.5" d="M2 4h20v18H2zm5-3v3m10-3v3M2 8h20M5 12.5h3m-3 5h3m2.5-5h3m2.5 0h3m-8.5 5h3" />
+          </svg>
+        </span>
+        <span class="belmont-nav-link-label">Studio Schedule</span>
+      </a>
+
+      <a class="belmont-nav-link" data-page="videos" href="https://bradwintersmusic-cloud.github.io/studio-videos/">
+        <span class="belmont-nav-link-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10">
+              <path d="M3.5 5.5h-3v18h18v-3" />
+              <path d="M22.5 1.5h-19v19h19z" />
+              <path d="M10.5 7v8l7-4z" />
+            </g>
+          </svg>
+        </span>
+        <span class="belmont-nav-link-label">Video Library</span>
+      </a>
+
+      <a class="belmont-nav-link" data-page="policies" href="https://bradwintersmusic-cloud.github.io/studio-policies/">
+        <span class="belmont-nav-link-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="currentColor" d="m2.3 20.28l9.6-9.6l-1.4-1.42l-.72.71a.996.996 0 0 1-1.41 0l-.71-.71a.996.996 0 0 1 0-1.41l5.66-5.66a.996.996 0 0 1 1.41 0l.71.71c.39.39.39 1.02 0 1.41l-.71.69l1.42 1.43a.996.996 0 0 1 1.41 0c.39.39.39 1.03 0 1.42l1.41 1.41l.71-.71c.39-.39 1.03-.39 1.42 0l.7.71c.39.39.39 1.03 0 1.42l-5.65 5.65c-.39.39-1.03.39-1.42 0l-.7-.7a.99.99 0 0 1 0-1.42l.7-.71l-1.41-1.41l-9.61 9.61a.996.996 0 0 1-1.41 0c-.39-.39-.39-1.03 0-1.42M20 19a2 2 0 0 1 2 2v1H12v-1a2 2 0 0 1 2-2z" />
+          </svg>
+        </span>
+        <span class="belmont-nav-link-label">Policies</span>
+      </a>
+
+      <a class="belmont-nav-link is-current" data-page="tools" href="https://bradwintersmusic-cloud.github.io/studio-tools/">
+        <span class="belmont-nav-link-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+        </span>
+        <span class="belmont-nav-link-label">Studio Tools</span>
+      </a>
+    </nav>
+  </div>
+
+  <script>
+  (function() {
+    var nav = document.getElementById('belmontNav');
+    var toggle = document.getElementById('belmontNavToggle');
+
+    var current = nav.getAttribute('data-current');
+    var links = nav.querySelectorAll('.belmont-nav-link');
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].getAttribute('data-page') === current) {
+        links[i].classList.add('is-current');
+      }
+    }
+
+    toggle.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var isOpen = nav.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    });
+
+    document.addEventListener('click', function(e) {
+      if (!nav.contains(e.target)) {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        nav.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+  </script>
+
+</body>
+</html>
