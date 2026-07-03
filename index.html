@@ -611,7 +611,7 @@
 
   <header class="page-header">
     <div class="wordmark">Belmont University &middot; AET</div>
-    <h1>AET Studio Tools</h1>
+    <h1>Studio Tools</h1>
     <div class="meta">Tap tempo, delay calculator, frequency reference, and signal generator</div>
     <div class="tabs">
       <button class="tab-btn active" data-view="main">Tempo / Delay Calc</button>
@@ -841,13 +841,13 @@
       var osc = ctx.createOscillator();
       var gain = ctx.createGain();
       osc.type = "square";
-      osc.frequency.value = 1800;
+      osc.frequency.value = 600;
       gain.gain.setValueAtTime(0.35, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.045);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.025);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.05);
+      osc.stop(ctx.currentTime + 0.03);
 
       metronomePulse.style.opacity = "1";
       setTimeout(function() { metronomePulse.style.opacity = "0"; }, 80);
@@ -1206,6 +1206,13 @@
           </svg>
         </span>
         <span class="belmont-nav-link-label">Studio Tools</span>
+      </a>
+
+      <a class="belmont-nav-link" data-page="musicians" href="https://bradwintersmusic-cloud.github.io/studio-musicians/">
+        <span class="belmont-nav-link-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m42.31 13.38l-25.1 3.48V7.98l25.1-3.48zm0 0v17.15m-25.1-13.67v20.88"/><circle cx="11.45" cy="37.74" r="5.76"/><circle cx="36.55" cy="30.53" r="5.76"/></svg>
+        </span>
+        <span class="belmont-nav-link-label">Session Musicians</span>
       </a>
     </nav>
   </div>
