@@ -291,7 +291,7 @@
   table { width: 100%; border-collapse: collapse; }
 
   thead th {
-    padding: 7px 14px;
+    padding: 7px 22px;
     text-align: left;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -307,7 +307,7 @@
   tbody tr:last-child { border-bottom: none; }
   tbody tr:hover { background: var(--accent-bg); }
 
-  td { padding: 8px 14px; vertical-align: middle; }
+  td { padding: 8px 28px; vertical-align: middle; }
   .note-name { font-weight: 500; color: var(--text); }
   .note-ms { font-family: 'IBM Plex Mono', monospace; color: var(--blue); font-size: 13px; }
 
@@ -321,6 +321,7 @@
   .poly-card { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 10px 12px; }
 
   .poly-card .poly-label {
+    padding: 0px 10px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
     letter-spacing: 0.08em;
@@ -329,7 +330,7 @@
     margin-bottom: 4px;
   }
 
-  .poly-card .poly-value { font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--blue); }
+  .poly-card .poly-value { padding: 0px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 16px; color: var(--blue); }
 
   /* KEY / FREQUENCY CALCULATOR */
   .key-controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
@@ -660,6 +661,137 @@
   66%  { transform: translate(-20px, 30px) scale(0.97); }
   100% { transform: translate(15px, 10px) scale(1.03); }
 }
+
+.tuner-panel {
+  margin-bottom: 24px;
+}
+ 
+.tuner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 20px 20px;
+}
+ 
+/* ── Arc canvas ── */
+.tuner-arc-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 360px;
+}
+ 
+#tunerCanvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+ 
+/* ── Note display ── */
+.tuner-note-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 6px;
+  line-height: 1;
+}
+ 
+.tuner-note {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 56px;
+  font-weight: 500;
+  color: var(--blue);
+  letter-spacing: -0.02em;
+  min-width: 60px;
+  text-align: center;
+  transition: color 0.15s;
+}
+ 
+.tuner-note.in-tune { color: var(--green, #4caf82); }
+.tuner-note.idle    { color: var(--muted); }
+ 
+.tuner-octave {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px;
+  color: var(--muted);
+  padding-bottom: 8px;
+}
+ 
+/* ── Cents readout ── */
+.tuner-cents {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 13px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  min-height: 18px;
+  text-align: center;
+}
+ 
+.tuner-cents.in-tune { color: var(--green, #4caf82); }
+ 
+/* ── Frequency readout ── */
+.tuner-freq {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.6;
+  letter-spacing: 0.06em;
+}
+ 
+/* ── Controls row ── */
+.tuner-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  max-width: 360px;
+}
+ 
+.tuner-btn {
+  flex: 1;
+  background: var(--surface2);
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  color: var(--muted);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 13px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+ 
+.tuner-btn svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+ 
+.tuner-btn.on {
+  background: var(--accent-bg);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+ 
+.tuner-btn.on svg { stroke: var(--accent); }
+ 
+/* ── Permission error ── */
+.tuner-error {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+  text-align: center;
+  display: none;
+  padding: 8px 0;
+}
 </style>
 </head>
 <body>
@@ -677,7 +809,7 @@
     <div class="tabs">
       <button class="tab-btn active" data-view="main">Tempo / Delay Calc</button>
       <button class="tab-btn" data-view="key">Key / Frequency</button>
-      <button class="tab-btn" data-view="signal">Signal Generator</button>
+      <button class="tab-btn" data-view="signal">Tuner / Signal Gen</button>
     </div>
   </header>
 
@@ -776,6 +908,34 @@
     </div>
 
     <div class="view" id="view-signal">
+      <div class="section-heading"><div class="dot"></div>Tuner</div>
+<div class="panel tuner-panel">
+  <div class="tuner-wrap">
+ 
+    <canvas id="tunerCanvas" width="360" height="200" aria-label="Tuner needle display"></canvas>
+ 
+    <div class="tuner-note-row">
+      <span class="tuner-note idle" id="tunerNote">—</span>
+      <span class="tuner-octave" id="tunerOctave"></span>
+    </div>
+ 
+    <div class="tuner-cents" id="tunerCents">—</div>
+    <div class="tuner-freq" id="tunerFreq"></div>
+ 
+    <div class="tuner-controls">
+      <button class="tuner-btn" id="tunerBtn">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Enable Tuner
+      </button>
+    </div>
+ 
+    <div class="tuner-error" id="tunerError">
+      Microphone access denied. Check your browser permissions.
+    </div>
+ 
+  </div>
+</div>
+-->
       <div class="section-heading"><div class="dot"></div>Signal Generator</div>
       <div class="panel">
 
@@ -786,7 +946,7 @@
             <label for="freqInput">Frequency (Hz)</label>
             <input type="number" class="gen-value-input" id="freqInput" value="440" min="20" max="20000" step="1">
           </div>
-          <input type="range" id="freqSlider" min="20" max="20000" value="440" step="1">
+          <input type="range" id="freqSlider" min="0" max="1000" value="487" step="1">
         </div>
 
         <div class="gen-control">
@@ -822,6 +982,7 @@
       }
       if (name !== "main" && metronomeOn) { toggleMetronome(false); }
       if (name !== "signal" && genPlaying) { toggleGenerator(false); }
+      if (name !== "signal" && tunerRunning) { stopTuner(); }
     }
 
     for (var i = 0; i < tabBtns.length; i++) {
@@ -1071,6 +1232,310 @@
     scaleSelect.addEventListener("change", renderFreqTable);
     refPitch.addEventListener("change", renderFreqTable);
 
+    // TUNER
+    var tunerBtn = document.getElementById("tunerBtn");
+    var tunerNote = document.getElementById("tunerNote");
+    var tunerOctave = document.getElementById("tunerOctave");
+    var tunerCents = document.getElementById("tunerCents");
+    var tunerFreq = document.getElementById("tunerFreq");
+    var tunerError = document.getElementById("tunerError");
+    var tunerCanvas = document.getElementById("tunerCanvas");
+    var tunerCtx = tunerCanvas.getContext("2d");
+ 
+    var tunerRunning = false;
+    var tunerStream = null;
+    var tunerSource = null;
+    var tunerAnalyser = null;
+    var tunerAnimFrame = null;
+    var tunerAudioCtx = null;
+    var lastDisplayCents = 0;
+    var lastNote = null;
+    var lastCents = 0;
+    var lastFreq = 0;
+    var inTuneFrames = 0;
+ 
+    var NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
+    var A4_FREQ = 440;
+    var A4_MIDI = 69;
+    var IN_TUNE_THRESHOLD = 5; // cents
+ 
+    // YIN algorithm
+    function yinPitch(buffer, sampleRate) {
+      var bufSize = buffer.length;
+      var halfBuf = Math.floor(bufSize / 2);
+      var yinBuf = new Float32Array(halfBuf);
+      var probability = 0;
+      var tau;
+ 
+      // Step 1: difference function
+      yinBuf[0] = 1;
+      var runningSum = 0;
+      for (tau = 1; tau < halfBuf; tau++) {
+        var sum = 0;
+        for (var i = 0; i < halfBuf; i++) {
+          var delta = buffer[i] - buffer[i + tau];
+          sum += delta * delta;
+        }
+        yinBuf[tau] = sum;
+        runningSum += sum;
+        // Cumulative mean normalized difference
+        yinBuf[tau] *= tau / runningSum;
+      }
+ 
+      // Step 2: absolute threshold
+      var tauEstimate = -1;
+      for (tau = 2; tau < halfBuf; tau++) {
+        if (yinBuf[tau] < 0.15) {
+          while (tau + 1 < halfBuf && yinBuf[tau + 1] < yinBuf[tau]) { tau++; }
+          probability = 1 - yinBuf[tau];
+          tauEstimate = tau;
+          break;
+        }
+      }
+ 
+      if (tauEstimate === -1 || probability < 0.5) { return -1; }
+ 
+      // Step 3: parabolic interpolation for sub-sample accuracy
+      var betterTau;
+      var x0 = tauEstimate < 1 ? tauEstimate : tauEstimate - 1;
+      var x2 = tauEstimate + 1 < halfBuf ? tauEstimate + 1 : tauEstimate;
+      if (x0 === tauEstimate) {
+        betterTau = yinBuf[tauEstimate] <= yinBuf[x2] ? tauEstimate : x2;
+      } else if (x2 === tauEstimate) {
+        betterTau = yinBuf[tauEstimate] <= yinBuf[x0] ? tauEstimate : x0;
+      } else {
+        var s0 = yinBuf[x0], s1 = yinBuf[tauEstimate], s2 = yinBuf[x2];
+        betterTau = tauEstimate + (s2 - s0) / (2 * (2 * s1 - s2 - s0));
+      }
+ 
+      return sampleRate / betterTau;
+    }
+ 
+    function freqToNoteInfo(freq) {
+      if (freq <= 0) { return null; }
+      var midi = 12 * (Math.log2(freq / A4_FREQ)) + A4_MIDI;
+      var midiRounded = Math.round(midi);
+      var cents = Math.round((midi - midiRounded) * 100);
+      var noteName = NOTE_NAMES[((midiRounded % 12) + 12) % 12];
+      var octave = Math.floor(midiRounded / 12) - 1;
+      var targetFreq = A4_FREQ * Math.pow(2, (midiRounded - A4_MIDI) / 12);
+      return { note: noteName, octave: octave, cents: cents, freq: freq, targetFreq: targetFreq };
+    }
+ 
+    // Canvas drawing
+    var CW = 360, CH = 200;
+    var CX = CW / 2, CY = CH - 20;
+    var RADIUS = 150;
+    var ARC_START = Math.PI * 1.05;
+    var ARC_END   = Math.PI * 1.95;
+    var ARC_RANGE = ARC_END - ARC_START;
+ 
+    function drawTuner(cents, inTune) {
+      var dpr = window.devicePixelRatio || 1;
+      tunerCanvas.width  = CW * dpr;
+      tunerCanvas.height = CH * dpr;
+      tunerCanvas.style.width  = CW + "px";
+      tunerCanvas.style.height = CH + "px";
+      tunerCtx.scale(dpr, dpr);
+ 
+      tunerCtx.clearRect(0, 0, CW, CH);
+ 
+      var green  = "#4caf82";
+      var gold   = "#c8a86b";
+      var blue   = "#5b9cf6";
+      var muted  = "#8f8e9d";
+      var border = "#252533";
+      var surf2  = "#1b1b26";
+ 
+      // Arc track
+      tunerCtx.beginPath();
+      tunerCtx.arc(CX, CY, RADIUS, ARC_START, ARC_END);
+      tunerCtx.strokeStyle = border;
+      tunerCtx.lineWidth = 3;
+      tunerCtx.stroke();
+ 
+      // Center zone highlight (±5 cents)
+      var zoneHalf = (10 / 100) * (ARC_RANGE / 2);
+      var midAngle = (ARC_START + ARC_END) / 2;
+      tunerCtx.beginPath();
+      tunerCtx.arc(CX, CY, RADIUS, midAngle - zoneHalf, midAngle + zoneHalf);
+      tunerCtx.strokeStyle = inTune ? "rgba(76,175,130,0.45)" : "rgba(76,175,130,0.18)";
+      tunerCtx.lineWidth = 5;
+      tunerCtx.stroke();
+ 
+      // Tick marks
+      var tickAngles = [-50, -25, -10, 0, 10, 25, 50];
+      for (var t = 0; t < tickAngles.length; t++) {
+        var cVal = tickAngles[t];
+        var ang = (ARC_START + ARC_END) / 2 + (cVal / 100) * (ARC_RANGE / 2);
+        var isCenter = cVal === 0;
+        var tickLen = isCenter ? 14 : 8;
+        var r0 = RADIUS - tickLen;
+        var r1 = RADIUS + 3;
+        tunerCtx.beginPath();
+        tunerCtx.moveTo(CX + r0 * Math.cos(ang), CY + r0 * Math.sin(ang));
+        tunerCtx.lineTo(CX + r1 * Math.cos(ang), CY + r1 * Math.sin(ang));
+        tunerCtx.strokeStyle = isCenter ? green : border;
+        tunerCtx.lineWidth = isCenter ? 2 : 1.5;
+        tunerCtx.stroke();
+ 
+        // Tick labels
+        if (cVal !== 0) {
+          var labelR = RADIUS - 22;
+          tunerCtx.fillStyle = muted;
+          tunerCtx.font = "10px 'IBM Plex Mono', monospace";
+          tunerCtx.textAlign = "center";
+          tunerCtx.textBaseline = "middle";
+          tunerCtx.fillText((cVal > 0 ? "+" : "") + cVal, CX + labelR * Math.cos(ang), CY + labelR * Math.sin(ang));
+        }
+      }
+ 
+      // Needle
+      lastDisplayCents = lastDisplayCents + (cents - lastDisplayCents) * 0.2;
+var clampedCents = Math.max(-50, Math.min(50, lastDisplayCents));
+      var needleAngle = (ARC_START + ARC_END) / 2 + (clampedCents / 100) * (ARC_RANGE / 2);
+      var needleLen = RADIUS - 8;
+      var needleColor = inTune ? green : (cents < 0 ? blue : gold);
+ 
+      // Needle shadow/glow
+      tunerCtx.save();
+      tunerCtx.shadowColor = needleColor;
+      tunerCtx.shadowBlur = inTune ? 14 : 6;
+      tunerCtx.beginPath();
+      tunerCtx.moveTo(CX, CY);
+      tunerCtx.lineTo(
+        CX + needleLen * Math.cos(needleAngle),
+        CY + needleLen * Math.sin(needleAngle)
+      );
+      tunerCtx.strokeStyle = needleColor;
+      tunerCtx.lineWidth = 2.5;
+      tunerCtx.lineCap = "round";
+      tunerCtx.stroke();
+      tunerCtx.restore();
+ 
+      // Pivot dot
+      tunerCtx.beginPath();
+      tunerCtx.arc(CX, CY, 5, 0, Math.PI * 2);
+      tunerCtx.fillStyle = needleColor;
+      tunerCtx.fill();
+ 
+      // L / R labels
+      tunerCtx.fillStyle = muted;
+      tunerCtx.font = "10px 'IBM Plex Mono', monospace";
+      tunerCtx.textAlign = "center";
+      tunerCtx.textBaseline = "middle";
+      var leftAng  = ARC_START + 0.08;
+      var rightAng = ARC_END   - 0.08;
+      tunerCtx.fillText("flat",  CX + (RADIUS + 18) * Math.cos(leftAng),  CY + (RADIUS + 18) * Math.sin(leftAng));
+      tunerCtx.fillText("sharp", CX + (RADIUS + 18) * Math.cos(rightAng), CY + (RADIUS + 18) * Math.sin(rightAng));
+    }
+ 
+    function drawIdleTuner() {
+      drawTuner(0, false);
+    }
+ 
+    function tunerLoop() {
+      if (!tunerRunning || !tunerAnalyser) { return; }
+ 
+      var bufSize = tunerAnalyser.fftSize;
+      var buffer = new Float32Array(bufSize);
+      tunerAnalyser.getFloatTimeDomainData(buffer);
+ 
+      // RMS gate — ignore silence
+      var rms = 0;
+      for (var i = 0; i < bufSize; i++) { rms += buffer[i] * buffer[i]; }
+      rms = Math.sqrt(rms / bufSize);
+ 
+      if (rms < 0.01) {
+        // Below noise floor — hold last values, don't update
+        tunerAnimFrame = requestAnimationFrame(tunerLoop);
+        return;
+      }
+ 
+      var freq = yinPitch(buffer, tunerAudioCtx.sampleRate);
+      var info = freq > 0 ? freqToNoteInfo(freq) : null;
+ 
+      if (info && info.freq > 20 && info.freq < 2000) {
+        lastNote  = info.note;
+        lastCents = info.cents;
+        lastFreq  = info.freq;
+ 
+        var inTune = Math.abs(info.cents) <= IN_TUNE_THRESHOLD;
+        inTuneFrames = inTune ? inTuneFrames + 1 : 0;
+        var stableInTune = inTuneFrames > 8;
+ 
+        tunerNote.textContent = info.note;
+        tunerNote.className = "tuner-note" + (stableInTune ? " in-tune" : "");
+        tunerOctave.textContent = info.octave;
+ 
+        var centsLabel = info.cents === 0 ? "in tune" :
+          (info.cents > 0 ? "+" + info.cents : info.cents) + " cents";
+        tunerCents.textContent = centsLabel;
+        tunerCents.className = "tuner-cents" + (stableInTune ? " in-tune" : "");
+        tunerFreq.textContent = info.freq.toFixed(1) + " Hz";
+ 
+        drawTuner(info.cents, stableInTune);
+      }
+ 
+      tunerAnimFrame = requestAnimationFrame(tunerLoop);
+    }
+ 
+    function startTuner() {
+      navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+        .then(function(stream) {
+          tunerStream = stream;
+          tunerAudioCtx = getCtx();
+          tunerSource = tunerAudioCtx.createMediaStreamSource(stream);
+          tunerAnalyser = tunerAudioCtx.createAnalyser();
+          tunerAnalyser.fftSize = 4096;
+          tunerAnalyser.smoothingTimeConstant = 0;
+          tunerSource.connect(tunerAnalyser);
+          // Do NOT connect analyser to destination — silent monitoring
+ 
+          tunerRunning = true;
+          tunerBtn.textContent = "Disable Tuner";
+          tunerBtn.classList.add("on");
+          tunerError.style.display = "none";
+ 
+          // Mute signal generator if running
+          if (genPlaying) { toggleGenerator(false); }
+ 
+          tunerLoop();
+        })
+        .catch(function() {
+          tunerError.style.display = "block";
+        });
+    }
+ 
+    function stopTuner() {
+      tunerRunning = false;
+      if (tunerAnimFrame) { cancelAnimationFrame(tunerAnimFrame); }
+      if (tunerSource) { tunerSource.disconnect(); }
+      if (tunerStream) {
+        var tracks = tunerStream.getTracks();
+        for (var i = 0; i < tracks.length; i++) { tracks[i].stop(); }
+      }
+      tunerSource = null;
+      tunerStream = null;
+      tunerAnalyser = null;
+      tunerBtn.textContent = "Enable Tuner";
+      tunerBtn.classList.remove("on");
+      drawIdleTuner();
+    }
+ 
+    function toggleTuner() {
+      if (tunerRunning) { stopTuner(); } else { startTuner(); }
+    }
+ 
+    tunerBtn.addEventListener("click", toggleTuner);
+ 
+    // Stop tuner when leaving the signal tab
+    // Find the existing switchView function and add this inside it:
+    // if (name !== "signal" && tunerRunning) { stopTuner(); }
+    // (See note below about switchView integration)
+ 
+    drawIdleTuner();
+    
     // SIGNAL GENERATOR
     var waveGrid = document.getElementById("waveGrid");
     var freqSlider = document.getElementById("freqSlider");
@@ -1126,7 +1591,27 @@
         updateGenLive();
       });
     }
-    syncPair(freqSlider, freqInput, 20, 20000);
+    // Logarithmic scale: slider 0-1000, maps to 20Hz-20kHz with 1kHz at center (500)
+function sliderToFreq(v) {
+  return Math.round(20 * Math.pow(1000, v / 1000));
+}
+
+function freqToSlider(f) {
+  return Math.round(1000 * Math.log(f / 20) / Math.log(1000));
+}
+
+freqSlider.addEventListener("input", function() {
+  freqInput.value = sliderToFreq(parseFloat(this.value));
+  updateGenLive();
+});
+
+freqInput.addEventListener("input", function() {
+  var v = parseFloat(this.value);
+  if (isNaN(v)) { return; }
+  v = Math.max(20, Math.min(20000, v));
+  freqSlider.value = freqToSlider(v);
+  updateGenLive();
+});
     syncPair(volSlider, volInput, 0, 100);
 
     var genPlaying = false;
