@@ -218,26 +218,168 @@
   #analyzerCanvas { display: block; width: 100%; height: auto; }
 
   /* Meter */
-  .meter-wrap { display: flex; flex-direction: column; gap: 10px; }
-  .meter-channel { display: flex; flex-direction: column; gap: 4px; }
-  .meter-label-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .meter-channel-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-  .meter-readout { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--blue); letter-spacing: 0.04em; }
-  .meter-readout.clip { color: #f87171; }
-  .meter-track { position: relative; height: 20px; background: var(--bg); border: 1px solid var(--border); border-radius: 3px; overflow: hidden; }
-  .meter-bar { position: absolute; top: 0; left: 0; bottom: 0; width: 0%; border-radius: 2px; transition: width 0.04s linear; }
-  .meter-bar.ch-l { background: linear-gradient(90deg, #4caf82 0%, #c8a86b 75%, #f87171 100%); }
-  .meter-bar.ch-r { background: linear-gradient(90deg, #4caf82 0%, #c8a86b 75%, #f87171 100%); }
-  .meter-peak-line { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--accent); opacity: 0; transition: opacity 0.3s; }
-  .meter-peak-line.visible { opacity: 1; }
-  .meter-peak-line.clip-line { background: #f87171; }
-  .meter-clip-indicator { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; padding: 1px 6px; border-radius: 3px; background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); opacity: 0; transition: opacity 0.15s; }
-  .meter-clip-indicator.visible { opacity: 1; }
-  .meter-scale { display: flex; justify-content: space-between; padding: 0 2px; }
-  .meter-scale span { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--muted); opacity: 0.6; }
-  .lufs-readout-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0 2px; border-top: 1px solid var(--border); margin-top: 4px; }
-  .lufs-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-  .lufs-value { font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--blue); letter-spacing: -0.01em; }
+  .meter-wrap { display: flex; flex-direction: column; gap: 14px; }
+ 
+  /* Dorrough meters */
+  .dorrough-section { display: flex; flex-direction: column; gap: 8px; }
+ 
+  .dorrough-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+ 
+  .dorrough-ch-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+ 
+  .dorrough-readout {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--blue);
+    letter-spacing: 0.04em;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+ 
+  .dorrough-peak-val { color: var(--accent); }
+  .dorrough-rms-val  { color: var(--blue); }
+ 
+  .dorrough-clip-indicator {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: rgba(248,113,113,0.15);
+    color: #f87171;
+    border: 1px solid rgba(248,113,113,0.3);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+ 
+  .dorrough-clip-indicator.visible { opacity: 1; }
+ 
+  .dorrough-track {
+    position: relative;
+    height: 22px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+ 
+  /* RMS fill — slower, wider, slightly transparent */
+  .dorrough-rms-bar {
+    position: absolute;
+    top: 0; left: 0; bottom: 0;
+    width: 0%;
+    border-radius: 2px;
+    background: linear-gradient(90deg,
+      rgba(76,175,130,0.6)  0%,
+      rgba(200,168,107,0.7) 70%,
+      rgba(248,113,113,0.8) 92%,
+      rgba(248,113,113,0.9) 100%
+    );
+    transition: width 0.12s ease-out;
+  }
+ 
+  /* Peak indicator — fast, bright, 2px wide */
+  .dorrough-peak-bar {
+    position: absolute;
+    top: 1px; bottom: 1px;
+    width: 3px;
+    left: 0%;
+    border-radius: 1px;
+    background: #e6e2d9;
+    box-shadow: 0 0 4px rgba(200,168,107,0.8);
+    transition: left 0.02s linear;
+  }
+ 
+  .dorrough-peak-bar.clip { background: #f87171; box-shadow: 0 0 6px rgba(248,113,113,0.9); }
+ 
+  /* Scale ticks */
+  .dorrough-scale {
+    display: flex;
+    justify-content: space-between;
+    padding: 0 2px;
+  }
+ 
+  .dorrough-scale span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    opacity: 0.6;
+  }
+ 
+  /* Divider between meter sections */
+  .meter-section-divider {
+    height: 1px;
+    background: var(--border);
+    opacity: 0.5;
+  }
+ 
+  /* LUFS row */
+  .lufs-readout-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 2px;
+  }
+ 
+  .lufs-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+ 
+  .lufs-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    color: var(--blue);
+    letter-spacing: -0.01em;
+  }
+ 
+  /* SPL row */
+  .spl-readout-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0 2px;
+  }
+ 
+  .spl-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+ 
+  .spl-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    color: var(--green);
+    letter-spacing: -0.01em;
+  }
+ 
+  .spl-disclaimer {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    opacity: 0.5;
+    text-align: right;
+    letter-spacing: 0.04em;
+  }
 
   /* ── FLOATING NAV ── */
   .belmont-nav { position: fixed; z-index: 200; top: 24px; left: 24px; }
@@ -522,27 +664,65 @@
         <div class="section-heading"><div class="dot"></div>Level Meter</div>
         <div class="panel">
           <div class="meter-wrap">
-            <div class="meter-channel">
-              <div class="meter-label-row">
-                <span class="meter-channel-label">L</span>
-                <span class="meter-readout" id="meterReadL">— dBFS</span>
-                <span class="meter-clip-indicator" id="meterClipL">CLIP</span>
+ 
+            <!-- Dorrough-style meters -->
+            <div class="dorrough-section">
+ 
+              <!-- L channel -->
+              <div>
+                <div class="dorrough-label-row">
+                  <span class="dorrough-ch-label">L</span>
+                  <div class="dorrough-readout">
+                    <span class="dorrough-peak-val" id="dorrPeakL">— dB</span>
+                    <span class="dorrough-rms-val"  id="dorrRmsL">— dB</span>
+                    <span class="dorrough-clip-indicator" id="dorrClipL">CLIP</span>
+                  </div>
+                </div>
+                <div class="dorrough-track">
+                  <div class="dorrough-rms-bar"  id="dorrRmsBarL"></div>
+                  <div class="dorrough-peak-bar" id="dorrPeakBarL"></div>
+                </div>
               </div>
-              <div class="meter-track"><div class="meter-bar ch-l" id="meterBarL"></div><div class="meter-peak-line" id="meterPeakL"></div></div>
-            </div>
-            <div class="meter-channel">
-              <div class="meter-label-row">
-                <span class="meter-channel-label">R</span>
-                <span class="meter-readout" id="meterReadR">— dBFS</span>
-                <span class="meter-clip-indicator" id="meterClipR">CLIP</span>
+ 
+              <!-- R channel -->
+              <div>
+                <div class="dorrough-label-row">
+                  <span class="dorrough-ch-label">R</span>
+                  <div class="dorrough-readout">
+                    <span class="dorrough-peak-val" id="dorrPeakR">— dB</span>
+                    <span class="dorrough-rms-val"  id="dorrRmsR">— dB</span>
+                    <span class="dorrough-clip-indicator" id="dorrClipR">CLIP</span>
+                  </div>
+                </div>
+                <div class="dorrough-track">
+                  <div class="dorrough-rms-bar"  id="dorrRmsBarR"></div>
+                  <div class="dorrough-peak-bar" id="dorrPeakBarR"></div>
+                </div>
               </div>
-              <div class="meter-track"><div class="meter-bar ch-r" id="meterBarR"></div><div class="meter-peak-line" id="meterPeakR"></div></div>
+ 
+              <div class="dorrough-scale">
+                <span>-60</span><span>-48</span><span>-36</span>
+                <span>-24</span><span>-12</span><span>-6</span><span>0</span>
+              </div>
             </div>
-            <div class="meter-scale"><span>-60</span><span>-48</span><span>-36</span><span>-24</span><span>-18</span><span>-12</span><span>-6</span><span>0</span></div>
+ 
+            <div class="meter-section-divider"></div>
+ 
+            <!-- LUFS -->
             <div class="lufs-readout-row">
               <span class="lufs-label">Integrated LUFS (10s)</span>
               <span class="lufs-value" id="lufsValue">—</span>
             </div>
+ 
+            <div class="meter-section-divider"></div>
+ 
+            <!-- SPL -->
+            <div class="spl-readout-row">
+              <span class="spl-label">SPL (relative)</span>
+              <span class="spl-value" id="splValue">—</span>
+            </div>
+            <div class="spl-disclaimer">uncalibrated — relative reading only</div>
+
           </div>
         </div>
       </div>
@@ -1480,68 +1660,167 @@
   // ════════════════════════════════════════════════════════════════
   // LEVEL METER
   // ════════════════════════════════════════════════════════════════
-  function startMeter() {
-  var ctx = getCtx();
-  var src = getSharedMicSource(ctx);
-  if (!src) { return; }
-  lufsScriptNode = ctx.createScriptProcessor(1024, 1, 1);
-  src.connect(lufsScriptNode);
-  lufsScriptNode.connect(ctx.destination);
-  lufsScriptNode.onaudioprocess = function(e) {
-    var L = e.inputBuffer.getChannelData(0);
-    var sumL = 0, pkL = 0;
-    for (var i = 0; i < L.length; i++) {
-      sumL += L[i] * L[i];
-      if (Math.abs(L[i]) > pkL) { pkL = Math.abs(L[i]); }
-    }
-    var rmsL = Math.sqrt(sumL / L.length);
-    var dbL  = rmsL > 0 ? 20 * Math.log10(rmsL) : -Infinity;
-    var dbR  = dbL; // mirror mono to both channels
-    var now  = performance.now();
-    if (meterHoldMode === "none") { meterPeakL = dbL; meterPeakR = dbR; }
-    else if (meterHoldMode === "persistent") {
-      if (dbL > meterPeakL) { meterPeakL = dbL; meterPeakTimeL = now; }
-      if (dbR > meterPeakR) { meterPeakR = dbR; meterPeakTimeR = now; }
-    } else {
-      if (dbL > meterPeakL) { meterPeakL = dbL; meterPeakTimeL = now; }
-      if (dbR > meterPeakR) { meterPeakR = dbR; meterPeakTimeR = now; }
-      if (now - meterPeakTimeL > 3000) { meterPeakL = dbL; }
-      if (now - meterPeakTimeR > 3000) { meterPeakR = dbR; }
-    }
-    if (pkL >= 1.0) { meterClippedL = true; meterClippedR = true; }
-    var ms = sumL / L.length;
-    lufsBlocks.push(ms);
-    if (lufsBlocks.length > LUFS_WINDOW_BLOCKS) { lufsBlocks.shift(); }
-    updateMeterUI(dbL, dbR, now);
-  };
-  meterRunning = true;
-}
+  // Dorrough ballistics constants
+  var DORROUGH_PEAK_HOLD_MS  = 1700;  // peak holds for 1.7 seconds
+  var DORROUGH_PEAK_DECAY    = 0.94;  // peak falls at this rate per frame
+  var DORROUGH_RMS_ATTACK    = 0.08;  // RMS attack (fast up)
+  var DORROUGH_RMS_RELEASE   = 0.97;  // RMS release (slow down)
+ 
+  // Dorrough state
+  var dorrPeakLVal  = -Infinity, dorrPeakRVal  = -Infinity;
+  var dorrPeakLTime = 0,         dorrPeakRTime = 0;
+  var dorrRmsLVal   = -Infinity, dorrRmsRVal   = -Infinity;
+  var dorrClippedL  = false,     dorrClippedR  = false;
+ 
+  // SPL smoothing (slow, like a real SPL meter)
+  var splSmoothed = -Infinity;
+  var SPL_SMOOTH  = 0.92;
+ 
+  function dbToMeterPct(db) {
+    return Math.max(0, Math.min(100, (db + 60) / 60 * 100));
+  }
+ 
+  var dorrPeakLVal=  -Infinity, dorrPeakRVal=  -Infinity;
+  var dorrPeakLTime= 0,         dorrPeakRTime= 0;
+  var dorrRmsLVal=   -Infinity, dorrRmsRVal=   -Infinity;
+  var dorrClippedL=  false,     dorrClippedR=  false;
+  var splSmoothed=   -Infinity;
+  var SPL_SMOOTH=    0.92;
+  var DORROUGH_PEAK_HOLD_MS= 1700;
+  var DORROUGH_PEAK_DECAY=   0.94;
+  var DORROUGH_RMS_ATTACK=   0.08;
+  var DORROUGH_RMS_RELEASE=  0.97;
 
-  function updateMeterUI(dbL,dbR,now) {
-    meterBarLEl.style.width=dbToMeterPct(dbL)+"%";
-    meterBarREl.style.width=dbToMeterPct(dbR)+"%";
-    meterReadLEl.textContent=isFinite(dbL)?dbL.toFixed(1)+" dBFS":"— dBFS";
-    meterReadREl.textContent=isFinite(dbR)?dbR.toFixed(1)+" dBFS":"— dBFS";
-    if (meterHoldMode!=="none"&&isFinite(meterPeakL)){meterPeakLEl.style.left=dbToMeterPct(meterPeakL)+"%";meterPeakLEl.classList.add("visible");meterPeakLEl.classList.toggle("clip-line",meterPeakL>=0);}else{meterPeakLEl.classList.remove("visible");}
-    if (meterHoldMode!=="none"&&isFinite(meterPeakR)){meterPeakREl.style.left=dbToMeterPct(meterPeakR)+"%";meterPeakREl.classList.add("visible");meterPeakREl.classList.toggle("clip-line",meterPeakR>=0);}else{meterPeakREl.classList.remove("visible");}
-    meterClipLEl.classList.toggle("visible",meterClippedL);
-    meterClipREl.classList.toggle("visible",meterClippedR);
-    if (lufsBlocks.length>10) {
-      var sum=0; for(var i=0;i<lufsBlocks.length;i++){sum+=lufsBlocks[i];}
-      var avg=sum/lufsBlocks.length, lufs=avg>0?-0.691+10*Math.log10(avg):-Infinity;
-      lufsValueEl.textContent=isFinite(lufs)?lufs.toFixed(1)+" LUFS":"—";
+  function startMeter() {
+    var ctx = getCtx();
+    var src = getSharedMicSource(ctx);
+    if (!src) { return; }
+    lufsScriptNode = ctx.createScriptProcessor(1024, 1, 1);
+    src.connect(lufsScriptNode);
+    lufsScriptNode.connect(ctx.destination);
+ 
+    lufsScriptNode.onaudioprocess = function(e) {
+      var buf = e.inputBuffer.getChannelData(0);
+      var sum = 0, peak = 0;
+      for (var i = 0; i < buf.length; i++) {
+        sum += buf[i] * buf[i];
+        if (Math.abs(buf[i]) > peak) { peak = Math.abs(buf[i]); }
+      }
+ 
+      var rms   = Math.sqrt(sum / buf.length);
+      var dbRms = rms  > 0 ? 20 * Math.log10(rms)  : -Infinity;
+      var dbPk  = peak > 0 ? 20 * Math.log10(peak) : -Infinity;
+      var now   = performance.now();
+ 
+      // ── Dorrough peak ballistics ──
+      // Attack: instant snap to new peak if higher
+      // Hold: stay at peak for DORROUGH_PEAK_HOLD_MS
+      // Decay: fall at DORROUGH_PEAK_DECAY rate after hold
+      if (dbPk > dorrPeakLVal) {
+        dorrPeakLVal  = dbPk;
+        dorrPeakLTime = now;
+      } else if (now - dorrPeakLTime > DORROUGH_PEAK_HOLD_MS) {
+        dorrPeakLVal = dorrPeakLVal * DORROUGH_PEAK_DECAY + dbPk * (1 - DORROUGH_PEAK_DECAY);
+      }
+ 
+      // Mirror mono to R
+      dorrPeakRVal  = dorrPeakLVal;
+      dorrPeakRTime = dorrPeakLTime;
+ 
+      // ── Dorrough RMS ballistics ──
+      // Attack fast, release slow — classic average meter behavior
+      if (isFinite(dbRms)) {
+        if (!isFinite(dorrRmsLVal) || dbRms > dorrRmsLVal) {
+          dorrRmsLVal = dorrRmsLVal * DORROUGH_RMS_ATTACK + dbRms * (1 - DORROUGH_RMS_ATTACK);
+          if (!isFinite(dorrRmsLVal)) { dorrRmsLVal = dbRms; }
+        } else {
+          dorrRmsLVal = dorrRmsLVal * DORROUGH_RMS_RELEASE + dbRms * (1 - DORROUGH_RMS_RELEASE);
+        }
+      }
+      dorrRmsRVal = dorrRmsLVal;
+ 
+      // ── Clip detection ──
+      if (peak >= 1.0) { dorrClippedL = true; dorrClippedR = true; }
+ 
+      // ── LUFS (10s rolling window) ──
+      lufsBlocks.push(sum / buf.length);
+      if (lufsBlocks.length > LUFS_WINDOW_BLOCKS) { lufsBlocks.shift(); }
+ 
+      // ── SPL (slow-responding, relative) ──
+      // C-weighting approximation: apply gentle high-pass to RMS
+      // In browser we use a simple slow-smoothed RMS as the SPL proxy
+      if (isFinite(dbRms)) {
+        if (!isFinite(splSmoothed)) { splSmoothed = dbRms; }
+        else { splSmoothed = splSmoothed * SPL_SMOOTH + dbRms * (1 - SPL_SMOOTH); }
+      }
+ 
+      updateMeterUI(now);
+    };
+ 
+    meterRunning = true;
+  }
+ 
+  function updateMeterUI(now) {
+    // ── Dorrough L ──
+    var pkPctL  = dbToMeterPct(dorrPeakLVal);
+    var rmsPctL = dbToMeterPct(dorrRmsLVal);
+ 
+    document.getElementById("dorrRmsBarL").style.width  = rmsPctL + "%";
+    document.getElementById("dorrPeakBarL").style.left  = Math.max(0, pkPctL - 0.5) + "%";
+    document.getElementById("dorrPeakBarL").classList.toggle("clip", dorrPeakLVal >= 0);
+    document.getElementById("dorrPeakL").textContent    = isFinite(dorrPeakLVal) ? dorrPeakLVal.toFixed(1) + " dBFS" : "— dBFS";
+    document.getElementById("dorrRmsL").textContent     = isFinite(dorrRmsLVal)  ? dorrRmsLVal.toFixed(1)  + " dBFS" : "— dBFS";
+    document.getElementById("dorrClipL").classList.toggle("visible", dorrClippedL);
+ 
+    // ── Dorrough R (mirrors L for mono) ──
+    document.getElementById("dorrRmsBarR").style.width  = rmsPctL + "%";
+    document.getElementById("dorrPeakBarR").style.left  = Math.max(0, pkPctL - 0.5) + "%";
+    document.getElementById("dorrPeakBarR").classList.toggle("clip", dorrPeakRVal >= 0);
+    document.getElementById("dorrPeakR").textContent    = isFinite(dorrPeakRVal) ? dorrPeakRVal.toFixed(1) + " dBFS" : "— dBFS";
+    document.getElementById("dorrRmsR").textContent     = isFinite(dorrRmsRVal)  ? dorrRmsRVal.toFixed(1)  + " dBFS" : "— dBFS";
+    document.getElementById("dorrClipR").classList.toggle("visible", dorrClippedR);
+ 
+    // ── LUFS ──
+    if (lufsBlocks.length > 10) {
+      var sum = 0;
+      for (var i = 0; i < lufsBlocks.length; i++) { sum += lufsBlocks[i]; }
+      var avg  = sum / lufsBlocks.length;
+      var lufs = avg > 0 ? -0.691 + 10 * Math.log10(avg) : -Infinity;
+      document.getElementById("lufsValue").textContent = isFinite(lufs) ? lufs.toFixed(1) + " LUFS" : "—";
+    }
+ 
+    // ── SPL ──
+    var splEl = document.getElementById("splValue");
+    if (isFinite(splSmoothed)) {
+      // Offset to display as a positive-ish relative number (0 dBFS ref = ~94 dB SPL typical)
+      var splDisplay = splSmoothed + 94;
+      splEl.textContent = splDisplay.toFixed(1) + " dB";
+    } else {
+      splEl.textContent = "—";
     }
   }
-
+ 
   function stopMeter() {
-    meterRunning=false;
-    if(lufsScriptNode){try{lufsScriptNode.disconnect();}catch(e){}lufsScriptNode=null;}
-    lufsBlocks=[];
-    meterBarLEl.style.width="0%"; meterBarREl.style.width="0%";
-    meterPeakLEl.classList.remove("visible"); meterPeakREl.classList.remove("visible");
-    meterClippedL=false; meterClippedR=false;
-    meterClipLEl.classList.remove("visible"); meterClipREl.classList.remove("visible");
-    lufsValueEl.textContent="—"; meterReadLEl.textContent="— dBFS"; meterReadREl.textContent="— dBFS";
+    meterRunning = false;
+    if (lufsScriptNode) { try { lufsScriptNode.disconnect(); } catch(e){} lufsScriptNode = null; }
+    lufsBlocks = [];
+    dorrPeakLVal=-Infinity; dorrPeakRVal=-Infinity;
+    dorrRmsLVal=-Infinity;  dorrRmsRVal=-Infinity;
+    dorrClippedL=false;     dorrClippedR=false;
+    splSmoothed=-Infinity;
+ 
+    var ids = ["dorrRmsBarL","dorrRmsBarR"];
+    for (var i=0;i<ids.length;i++){document.getElementById(ids[i]).style.width="0%";}
+    document.getElementById("dorrPeakBarL").style.left="0%";
+    document.getElementById("dorrPeakBarR").style.left="0%";
+    document.getElementById("dorrClipL").classList.remove("visible");
+    document.getElementById("dorrClipR").classList.remove("visible");
+    document.getElementById("dorrPeakL").textContent="— dBFS";
+    document.getElementById("dorrRmsL").textContent="— dBFS";
+    document.getElementById("dorrPeakR").textContent="— dBFS";
+    document.getElementById("dorrRmsR").textContent="— dBFS";
+    document.getElementById("lufsValue").textContent="—";
+    document.getElementById("splValue").textContent="—";
   }
 
   function stopAnalysisMic() {
