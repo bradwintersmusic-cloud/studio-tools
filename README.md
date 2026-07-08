@@ -122,4 +122,4 @@ All analysis tools share a single mic stream managed by the Enable/Disable Mic b
 ## Repo
 
 `bradwintersmusic-cloud/studio-tools`
-Maintained by Belmont University AET — Mike Curb College of Entertainment & Music Business
+Maintained by Brad Winters
