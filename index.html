@@ -98,8 +98,8 @@
   .live-tempo-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--accent); }
   .live-tempo-bpm { font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: var(--blue); letter-spacing: -0.01em; min-width: 60px; text-align: right; }
   .live-tempo-bpm.active { color: var(--accent); }
-  .sensitivity-row { display: flex; align-items: center; gap: 10px; }
-  .sensitivity-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); white-space: nowrap; flex-shrink: 0; }
+  .sensitivity-row { font-family: 'IBM Plex Mono', monospace; color: var(--muted); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; display: flex; flex-direction: column; gap: 6px; width: 100%;align-items: center;}
+  .sensitivity-row input[type="range"] {width: 100%;}
   .live-tempo-btn { background: var(--surface2); border: 1.5px solid var(--border); border-radius: 5px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 14px; cursor: pointer; transition: all 0.15s; white-space: nowrap; display: flex; align-items: center; gap: 7px; }
   .live-tempo-btn svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
   .live-tempo-btn.on { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
@@ -137,8 +137,8 @@
   /* ── KEY / FREQUENCY ── */
   .key-controls { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 16px; }
   .key-controls label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
-  select { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 7px 10px; outline: none; cursor: pointer; }
-  select:focus { border-color: var(--accent); }
+   select { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 12px; padding: 7px 10px; outline: none; cursor: pointer; }
+   select:focus { border-color: var(--accent); }
   .freq-table-wrap { max-height: 560px; overflow-y: auto; border: 1px solid var(--border); border-radius: 5px; }
   .freq-table-wrap table { border: none; }
   .freq-table-wrap thead th { position: sticky; top: 0; z-index: 1; }
@@ -545,7 +545,7 @@
             </div>
             <div class="sensitivity-row">
               <span class="sensitivity-label">Sensitivity</span>
-              <input type="range" id="tempoSensitivity" min="1" max="10" value="5" step="1" style="flex:1;">
+              <input type="range" id="tempoSensitivity" min="1" max="10" value="5" step="1">
             </div>
             <button class="live-tempo-btn" id="liveTempoBtn">
               <svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="3"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2"/></svg>
@@ -569,7 +569,7 @@
           <span class="switch-label">Dotted Values</span>
         </div>
       </div>
-      <table><thead><tr><th>Note Value</th><th>Delay (ms)</th></tr></thead><tbody id="delayTableBody"></tbody></table>
+      <table><thead><tr><th>Note Value</th><th>Delay (ms)</th><th>Triplet (ms)</th></tr></thead><tbody id="delayTableBody"></tbody></table>
     </div>
 
     <div class="section-heading"><div class="dot"></div>Polyrhythm Reference</div>
@@ -1045,9 +1045,14 @@
     for (var i = 0; i < noteValues.length; i++) {
       var nv = noteValues[i];
       var ms = quarterMs / nv.div;
+      var tripletMs = ms / 3;
       var label = nv.name;
-      if (dottedOn) { ms *= 1.5; label += " (dotted)"; }
-      html += '<tr><td class="note-name">' + label + '</td><td class="note-ms">' + ms.toFixed(1) + ' ms</td></tr>';
+      if (dottedOn) { ms = ms * 1.5; label += " (dotted)"; }
+      html += '<tr>' +
+        '<td class="note-name">' + label + '</td>' +
+        '<td class="note-ms">' + ms.toFixed(1) + ' ms</td>' +
+        '<td class="note-ms">' + tripletMs.toFixed(1) + ' ms</td>' +
+        '</tr>';
     }
     delayTableBody.innerHTML = html;
   }
