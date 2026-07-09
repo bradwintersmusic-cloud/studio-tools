@@ -1379,7 +1379,7 @@
     tunerCtx.beginPath(); tunerCtx.arc(CX,CY,RADIUS,midAngle-zoneHalf,midAngle+zoneHalf); tunerCtx.strokeStyle=inTune?"rgba(76,175,130,0.45)":"rgba(76,175,130,0.18)"; tunerCtx.lineWidth=5; tunerCtx.stroke();
     var tickAngles=[-50,-25,-10,0,10,25,50];
     for (var t=0;t<tickAngles.length;t++) {
-      var cVal=tickAngles[t], ang=midAngle+(cVal/100)*(ARC_RANGE/2), isCenter=cVal===0;
+      var cVal=tickAngles[t], ang=midAngle+(cVal/60)*(ARC_RANGE/2), isCenter=cVal===0;
       var r0=RADIUS-(isCenter?14:8), r1=RADIUS+3;
       tunerCtx.beginPath(); tunerCtx.moveTo(CX+r0*Math.cos(ang),CY+r0*Math.sin(ang)); tunerCtx.lineTo(CX+r1*Math.cos(ang),CY+r1*Math.sin(ang));
       tunerCtx.strokeStyle=isCenter?green:border; tunerCtx.lineWidth=isCenter?2:1.5; tunerCtx.stroke();
@@ -1387,7 +1387,7 @@
     }
     lastDisplayCents = lastDisplayCents + (cents - lastDisplayCents) * 0.2;
     var clampedCents = Math.max(-50, Math.min(50, lastDisplayCents));
-    var needleAngle = midAngle + (clampedCents/100)*(ARC_RANGE/2);
+    var needleAngle = midAngle + (clampedCents/60)*(ARC_RANGE/2);
     var needleLen = RADIUS-8, needleColor = inTune?green:(cents<0?blue:gold);
     tunerCtx.save(); tunerCtx.shadowColor=needleColor; tunerCtx.shadowBlur=inTune?14:6;
     tunerCtx.beginPath(); tunerCtx.moveTo(CX,CY); tunerCtx.lineTo(CX+needleLen*Math.cos(needleAngle),CY+needleLen*Math.sin(needleAngle));
